@@ -878,19 +878,13 @@ static inline void set_wiphy_pirv(struct wiphy *pwiphy, void *priv)
     *(void **)wiphy_priv(pwiphy) = priv;
 }
 
-static zt_s32 _add_key_cb(struct wiphy *wiphy, struct net_device *ndev,
-/*TODO: android #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119))*/
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+static zt_s32 _add_key_cb(struct wiphy *wiphy, struct wireless_dev *wdev,
                           int link_id,
-#endif
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
                           zt_u8 key_index, bool pairwise,
                           const zt_u8 *mac_addr,
-#else
-                          zt_u8 key_index, const zt_u8 *mac_addr,
-#endif
                           struct key_params *params)
 {
+    struct net_device *ndev = wdev->netdev;
     ndev_priv_st *pndev_priv = netdev_priv(ndev);
     nic_info_st *pnic_info = pndev_priv->nic;
     zt_u32 param_len;
@@ -968,17 +962,10 @@ exit :
 
 }
 
-static zt_s32 _get_key_cb(struct wiphy *wiphy, struct net_device *ndev,
-/*TODO: android #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119))*/
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+static zt_s32 _get_key_cb(struct wiphy *wiphy, struct wireless_dev *wdev,
                           int link_id,
-#endif
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
                           zt_u8 key_index, bool pairwise,
                           const zt_u8 *mac_addr,
-#else
-                          zt_u8 key_index, const zt_u8 *mac_addr,
-#endif
                           void *cookie,
                           void (*callback)(void *cookie,
                                   struct key_params *))
@@ -995,18 +982,12 @@ static zt_s32 _get_key_cb(struct wiphy *wiphy, struct net_device *ndev,
 }
 
 
-static zt_s32 _del_key_cb(struct wiphy *wiphy, struct net_device *ndev,
-/*TODO: android #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 15, 119))*/
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0))
+static zt_s32 _del_key_cb(struct wiphy *wiphy, struct wireless_dev *wdev,
                           int link_id,
-#endif
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
                           zt_u8 key_index, bool pairwise,
                           const zt_u8 *mac_addr)
-#else
-                          zt_u8 key_index, const zt_u8 *mac_addr)
-#endif
 {
+    struct net_device *ndev = wdev->netdev;
     ndev_priv_st *pndev_priv = netdev_priv(ndev);
     nic_info_st *pnic_info = pndev_priv->nic;
     sec_info_st *psec_info = pnic_info->sec_info;
@@ -1064,14 +1045,11 @@ static zt_s32 _set_default_key_cb(struct wiphy *wiphy,
 
 
 static zt_s32 _cfg80211_get_station(struct wiphy *wiphy,
-                                    struct net_device *ndev,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0))
-                                    zt_u8 *mac,
-#else
+                                    struct wireless_dev *wdev,
                                     const zt_u8 *mac,
-#endif
                                     struct station_info *sinfo)
 {
+    struct net_device *ndev = wdev->netdev;
     ndev_priv_st *pndev_priv        = NULL;
     nic_info_st *pnic_info          = NULL;
     wdn_net_info_st *pwdn_net_info  = NULL;
@@ -2258,7 +2236,7 @@ exit:
 }
 
 
-static zt_s32 _set_wiphy_params(struct wiphy *wiphy, zt_u32 changed)
+static zt_s32 _set_wiphy_params(struct wiphy *wiphy, int radio_idx, zt_u32 changed)
 {
     CFG80211_DBG();
 
@@ -2875,14 +2853,9 @@ static zt_s32 _leave_ibss_cb(struct wiphy *wiphy, struct net_device *ndev)
 }
 
 static zt_s32 _call_set_txpower(struct wiphy *wiphy,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
                                 struct wireless_dev *wdev,
-#endif
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 36)) || defined(COMPAT_KERNEL_RELEASE)
+                                int radio_idx,
                                 enum nl80211_tx_power_setting type, zt_s32 mbm)
-#else
-                                enum tx_power_setting type, zt_s32 dbm)
-#endif
 {
     CFG80211_DBG();
 
@@ -2891,9 +2864,8 @@ static zt_s32 _call_set_txpower(struct wiphy *wiphy,
 
 
 static zt_s32 _call_get_txpower(struct wiphy *wiphy,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
                                 struct wireless_dev *wdev,
-#endif
+                                int radio_idx, unsigned int link_id,
                                 zt_s32 *dbm)
 {
     CFG80211_DBG();
@@ -3038,13 +3010,9 @@ static zt_s32 _flush_pmksa_cb(struct wiphy *wiphy,
 }
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0))
-static zt_s32 _set_monitor_channel(struct wiphy *wiphy
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
-                                   , struct cfg80211_chan_def *chandef
-#else
-                                   , struct ieee80211_channel *chan, enum nl80211_channel_type channel_type
-#endif
-                                  )
+static zt_s32 _set_monitor_channel(struct wiphy *wiphy,
+                                   struct net_device *dev,
+                                   struct cfg80211_chan_def *chandef)
 {
 
     return 0;
@@ -3236,7 +3204,7 @@ void zt_ap_cfg80211_assoc_event_up(nic_info_st *pnic_info,  zt_u8 *passoc_req,
         sinfo.filled = STATION_INFO_ASSOC_REQ_IES;
         sinfo.assoc_req_ies = passoc_req + WLAN_HDR_A3_LEN + ie_offset;
         sinfo.assoc_req_ies_len = assoc_req_len - WLAN_HDR_A3_LEN - ie_offset;
-        cfg80211_new_sta(ndev, GetAddr2Ptr(passoc_req), &sinfo, GFP_ATOMIC);
+        cfg80211_new_sta(pnic_info->pwidev, GetAddr2Ptr(passoc_req), &sinfo, GFP_ATOMIC);
 #else
         channel = pcur_network->channel;
         freq = zt_ch_2_freq(channel);
@@ -3278,7 +3246,7 @@ void zt_ap_cfg80211_disassoc_event_up(nic_info_st *pnic_info,
     pwdn_info->state = E_WDN_AP_STATE_READY;
 #endif
 #if defined(ZT_USE_CFG80211_STA_EVENT) || defined(COMPAT_KERNEL_RELEASE)
-    cfg80211_del_sta(ndev, pwdn_info->mac, GFP_ATOMIC);
+    cfg80211_del_sta(pnic_info->pwidev, pwdn_info->mac, GFP_ATOMIC);
 #else
     channel = pcur_network->channel;
     freq = zt_ch_2_freq(channel);
@@ -3784,12 +3752,8 @@ static zt_s32 cfg80211_stop_ap(struct wiphy *wiphy, struct net_device *ndev
 }
 #endif
 static zt_s32 add_station(struct wiphy *wiphy,
-                          struct net_device *ndev,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0))
-                          zt_u8 *mac,
-#else
+                          struct wireless_dev *wdev,
                           const zt_u8 *mac,
-#endif
                           struct station_parameters *params)
 {
     zt_s32 ret = 0;
@@ -3799,31 +3763,26 @@ static zt_s32 add_station(struct wiphy *wiphy,
 }
 
 static zt_s32 del_station(struct wiphy *wiphy,
-                          struct net_device *ndev,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0))
-                          zt_u8 *mac
-#elif (LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0))
-                          const zt_u8 *mac
-#else
-                          struct station_del_parameters *params
-#endif
-                         )
+                          struct wireless_dev *wdev,
+                          struct station_del_parameters *params)
 {
     const zt_u8 *target_mac;
     zt_u16 reason_code;
     wdn_net_info_st *pwdn_info = NULL;
-    ndev_priv_st *pndev_priv = netdev_priv(ndev);
-    nic_info_st *pnic_info = pndev_priv->nic;
+    ndev_priv_st *pndev_priv;
+    nic_info_st *pnic_info;
+
+    if (wdev->netdev) {
+        pndev_priv = netdev_priv(wdev->netdev);
+        pnic_info = pndev_priv->nic;
+    } else {
+        return -EINVAL;
+    }
 
     CFG80211_DBG("mac addr: "ZT_MAC_FMT, ZT_MAC_ARG(nic_to_local_addr(pnic_info)));
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0))
-    target_mac = mac;
-    reason_code = ZT_80211_REASON_PREV_AUTH_NOT_VALID;
-#else
     target_mac = params->mac;
     reason_code = params->reason_code;
-#endif
     if (zt_mlme_check_mode(pnic_info, ZT_MASTER_MODE) != zt_true)
     {
         CFG80211_WARN("sys mode is not WIFI_AP_STATE");
@@ -3886,12 +3845,8 @@ static zt_s32 del_station(struct wiphy *wiphy,
 }
 
 static zt_s32 change_station(struct wiphy *wiphy,
-                             struct net_device *ndev,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 16, 0))
-                             zt_u8 *mac,
-#else
+                             struct wireless_dev *wdev,
                              const zt_u8 *mac,
-#endif
                              struct station_parameters *params)
 {
     CFG80211_DBG("mac addr:"ZT_MAC_FMT, ZT_MAC_ARG(mac));
@@ -3902,13 +3857,20 @@ static zt_s32 change_station(struct wiphy *wiphy,
 
 
 static zt_s32 dump_station(struct wiphy *wiphy,
-                           struct net_device *ndev, zt_s32 idx, zt_u8 *mac,
+                           struct wireless_dev *wdev, zt_s32 idx, zt_u8 *mac,
                            struct station_info *sinfo)
 {
 
     zt_s32 ret = 0;
-    ndev_priv_st *pndev_priv = netdev_priv(ndev);
-    nic_info_st *pnic_info = pndev_priv->nic;
+    ndev_priv_st *pndev_priv;
+    nic_info_st *pnic_info;
+
+    if (wdev->netdev) {
+        pndev_priv = netdev_priv(wdev->netdev);
+        pnic_info = pndev_priv->nic;
+    } else {
+        return -ENOENT;
+    }
 
     wdn_net_info_st *pwdn_info = NULL;
     CFG80211_DBG("mac addr: "ZT_MAC_FMT, ZT_MAC_ARG(nic_to_local_addr(pnic_info)));
@@ -4012,17 +3974,9 @@ static zt_s32 _sched_scan_stop(struct wiphy *wiphy,
 
 #ifdef ZT_CONFIG_P2P
 static zt_s32 cfg80211_remain_on_channel_cb(struct wiphy *wiphy,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0))
         struct wireless_dev *wdev,
-#else
-        struct net_device *ndev,
-#endif
         struct ieee80211_channel *channel,
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 8, 0))
-        enum nl80211_channel_type
-        channel_type,
-#endif
-        zt_u32 duration, zt_u64 *cookie)
+        zt_u32 duration, zt_u64 *cookie, const u8 *rx_addr)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0))
     struct net_device *ndev = wdev->netdev;

@@ -17,6 +17,8 @@
 #ifndef __OS_PRIV_H__
 #define __OS_PRIV_H__
 
+#include <linux/string.h>
+
 typedef __kernel_size_t         SIZE_T;
 typedef __kernel_ssize_t        SSIZE_T;
 
@@ -36,7 +38,7 @@ typedef struct tasklet_struct       zt_tasklet;
 #define zt_inline                   __always_inline
 
 #define zt_strchr                   strchr
-#define zt_strncpy                  strncpy
+#define zt_strncpy                  strscpy
 #define zt_strncmp                  strncmp
 #define zt_strcmp                   strcmp
 #define zt_memcpy                   memcpy

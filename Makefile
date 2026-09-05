@@ -45,6 +45,29 @@
   CONFIG_POWER_SAVING       = n
   CONFIG_NAME               = zt9101_ztopmac
 
+ccflags-y += -I$(WDRV_DIR)/os/
+ccflags-y += -I$(WDRV_DIR)/os/linux
+ccflags-y += -I$(WDRV_DIR)/os/linux/os_porting
+ccflags-y += -I$(WDRV_DIR)/os/linux/hif
+ccflags-y += -I$(WDRV_DIR)/os/linux/netdev
+ccflags-y += -I$(WDRV_DIR)/os/linux/cfg80211
+ccflags-y += -I$(WDRV_DIR)/os/linux/iw
+ccflags-y += -I$(WDRV_DIR)/os/linux/pwr
+ccflags-y += -I$(WDRV_DIR)/nic
+ccflags-y += -I$(WDRV_DIR)/nic/utility
+ccflags-y += -I$(WDRV_DIR)/nic/p2p
+ccflags-y += -DZT_DEBUG_LEVEL=$(CONFIG_DEBUG_LEVEL)
+ccflags-y += -D'ZT_VERSION="$(CONFIG_DRIVER_VER)"'
+ccflags-y += -DCONFIG_FW_FILE
+ccflags-y += -DCONFIG_ZT9101XV20_SUPPORT
+ccflags-y += -DCONFIG_ZT9101XV30_SUPPORT
+ccflags-y += -DCONFIG_USB_FLAG
+ccflags-y += -DCFG_ENABLE_AP_MODE
+ccflags-y += -DCFG_ENABLE_ADHOC_MODE
+ccflags-y += -DCFG_ENABLE_MONITOR_MODE
+ccflags-y += -DCONFIG_IOCTL_CFG80211 -DZT_USE_CFG80211_STA_EVENT
+ccflags-y += -DZT_WEP_AUTH_ENABLE_WEXT
+
 include $(WDRV_DIR)/$(PLATDIR)/platform.mak
 
 include $(WDRV_DIR)/$(SUBDIR)/linux/Makefile

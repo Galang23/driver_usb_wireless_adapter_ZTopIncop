@@ -59,7 +59,7 @@ union pn48
 
     zt_u64 val;
 
-#ifdef CONFIG_LITTLE_ENDIAN
+#ifdef __LITTLE_ENDIAN
 
     struct
     {
@@ -73,7 +73,7 @@ union pn48
         zt_u8 TSC7;
     } _byte_;
 
-#elif defined(CONFIG_BIG_ENDIAN)
+#elif defined(__BIG_ENDIAN)
 
     struct
     {
