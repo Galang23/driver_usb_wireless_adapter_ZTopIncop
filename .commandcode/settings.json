@@ -3,7 +3,8 @@
     "allow": [
       "mcp__context7__query-docs",
       "mcp__context7__resolve-library-id",
-      "Shell(make:*)"
+      "Shell(make:*)",
+      "Shell(ip:*)"
     ],
     "deny": [],
     "defaultMode": "default"

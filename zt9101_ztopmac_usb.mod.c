@@ -22,4 +22,4 @@ MODULE_ALIAS("usb:v2310p9086d*dc*dsc*dp*icFFiscFFipFFin*");
 MODULE_ALIAS("usb:v350Bp9086d*dc*dsc*dp*icFFiscFFipFFin*");
 MODULE_ALIAS("usb:v350Bp9106d*dc*dsc*dp*icFFiscFFipFFin*");
 
-MODULE_INFO(srcversion, "B92A2A876D6F5299D05D74E");
+MODULE_INFO(srcversion, "CDF8E425B4BFF49F88044E5");

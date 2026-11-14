@@ -1,5 +1,20 @@
 # Changelog
 
+## [Unreleased] - 2026-11-14
+
+### Added
+- Added `build.sh` to build separate modules for linux-lts and linux-zen.
+- Added `activate.sh` to auto-detect the running kernel flavour, rebuild the
+  matching module when needed, and load it.
+
+### Fixed
+- Fixed compilation on linux-lts 6.18:
+  - `add_key`, `get_key`, `del_key`, `get_station`, and the station callbacks
+    use `struct net_device *` again for kernels older than 7.2.
+  - `remain_on_channel` no longer gets the `rx_addr` argument before 7.2.
+- Kept kernel 7.3 support for the cookie-by-value and `rx_addr` cfg80211 API
+  changes.
+
 ## [Unreleased] - 2026-09-05
 
 ### Fixed
